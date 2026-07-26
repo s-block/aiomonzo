@@ -1,0 +1,109 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aiomonzo"
+dynamic = ["version"]
+description = "A typed, fully asynchronous client for the Monzo Developer API"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Joshua Rowe" }]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: AsyncIO",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.28.1,<1",
+    "pydantic>=2.12,<3",
+]
+
+[project.urls]
+Changelog = "https://github.com/s-block/aiomonzo/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/s-block/aiomonzo/wiki"
+Issues = "https://github.com/s-block/aiomonzo/issues"
+Source = "https://github.com/s-block/aiomonzo"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.10",
+    "mypy>=1.18",
+    "pre-commit>=4.3",
+    "pytest>=8.4",
+    "pytest-asyncio>=1.2",
+    "ruff>=0.13",
+    "twine>=6,<7",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aiomonzo"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/aiomonzo",
+    "docs",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md",
+]
+
+[tool.hatch.version]
+path = "src/aiomonzo/_version.py"
+
+[tool.uv]
+package = true
+exclude-newer = "7 days"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "ASYNC",
+    "B",
+    "C4",
+    "E",
+    "F",
+    "I",
+    "N",
+    "RUF",
+    "S",
+    "SIM",
+    "TCH",
+    "UP",
+    "W",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/**/*.py" = ["S603"]
+"tests/**/*.py" = ["S101", "S105", "S106"]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["src/aiomonzo", "tests", "scripts"]
+strict = true
+warn_unused_ignores = true
+show_error_codes = true
+pretty = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-config",
+    "--strict-markers",
+    "--import-mode=importlib",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
