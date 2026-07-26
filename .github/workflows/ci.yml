@@ -51,9 +51,9 @@ jobs:
 
       - name: Audit locked dependencies
         run: |
-          uv --preview-features audit-command audit --locked --python-version 3.12
-          uv --preview-features audit-command audit --locked --python-version 3.13
-          uv --preview-features audit-command audit --locked --python-version 3.14
+          env -u UV_FROZEN uv --preview-features audit-command audit --locked --python-version 3.12
+          env -u UV_FROZEN uv --preview-features audit-command audit --locked --python-version 3.13
+          env -u UV_FROZEN uv --preview-features audit-command audit --locked --python-version 3.14
 
       - name: Validate distributions
         run: make check-dist
