@@ -96,14 +96,15 @@ from aiomonzo import MonzoClient, OAuthClientConfig, OAuthToken, TokenStore
 
 
 class ApplicationTokenStore(TokenStore):
-    async def load(self) -> OAuthToken | None:
-        ...  # Load and decrypt for the current application user.
+    async def load(
+        self,
+    ) -> OAuthToken | None: ...  # Load and decrypt for the current application user.
 
-    async def save(self, token: OAuthToken) -> None:
-        ...  # Atomically replace access and rotated refresh tokens.
+    async def save(
+        self, token: OAuthToken
+    ) -> None: ...  # Atomically replace access and rotated refresh tokens.
 
-    async def clear(self) -> None:
-        ...  # Remove the current user's token set.
+    async def clear(self) -> None: ...  # Remove the current user's token set.
 
 
 oauth = OAuthClientConfig(

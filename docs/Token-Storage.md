@@ -13,14 +13,11 @@ from aiomonzo import OAuthToken, TokenStore
 
 
 class ApplicationTokenStore(TokenStore):
-    async def load(self) -> OAuthToken | None:
-        ...
+    async def load(self) -> OAuthToken | None: ...
 
-    async def save(self, token: OAuthToken) -> None:
-        ...
+    async def save(self, token: OAuthToken) -> None: ...
 
-    async def clear(self) -> None:
-        ...
+    async def clear(self) -> None: ...
 ```
 
 The store is responsible for one logical Monzo token set. A durable
@@ -115,9 +112,7 @@ class BrokerAccessTokenProvider(AccessTokenProvider):
         return await broker.get_usable_monzo_access_token()
 
     async def refresh_after_rejection(self, rejected_access_token: str) -> str:
-        return await broker.replace_rejected_monzo_access_token(
-            rejected_access_token
-        )
+        return await broker.replace_rejected_monzo_access_token(rejected_access_token)
 
 
 client = MonzoClient(
