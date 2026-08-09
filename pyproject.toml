@@ -40,7 +40,7 @@ dev = [
     "pytest>=8.4",
     "pytest-asyncio>=1.2",
     "ruff>=0.13",
-    "twine>=6,<7",
+    "twine>=6,<8",
 ]
 
 [tool.hatch.build.targets.wheel]
