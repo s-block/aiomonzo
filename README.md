@@ -1,5 +1,18 @@
 # aiomonzo
 
+[![CI][ci-badge]][ci]
+[![PyPI version][pypi-version-badge]][pypi]
+[![Python versions][python-versions-badge]][pypi]
+[![Typing: py.typed][typing-badge]][pep-561]
+[![License: MIT][license-badge]][license]
+
+**A fully async, typed Python client for the
+[Monzo Developer API](https://docs.monzo.com/).**
+
+- Async API access and OAuth flows with typed Pydantic models.
+- Automatic refresh-token rotation, safe retries, and secret-safe errors.
+- Caller-owned token storage with optional distributed refresh coordination.
+
 > [!IMPORTANT]
 > **Personal-use, unofficial package.** `aiomonzo` is an independent community
 > project. It is not developed, maintained, supported, approved, or endorsed by
@@ -11,12 +24,43 @@
 > small private integrations, not public customer-facing banking applications.
 > See the [Monzo Developer API introduction](https://docs.monzo.com/).
 
-`aiomonzo` is an unofficial, fully asynchronous and typed Python client for the
-[Monzo Developer API](https://docs.monzo.com/). It provides API, OAuth, retry,
-validation, and resource-lifecycle primitives while leaving credential storage,
-tenancy, user interfaces, and deployment policy to the application using it.
+## Quick start
 
-The package supports Python 3.12, 3.13, and 3.14.
+Install `aiomonzo` on Python 3.12, 3.13, or 3.14:
+
+```bash
+python -m pip install aiomonzo
+```
+
+For a short-lived local experiment, generate a token in the
+[Monzo developer tools](https://developers.monzo.com/), approve access in the
+Monzo mobile app when prompted, and provide it through the environment:
+
+```bash
+export MONZO_ACCESS_TOKEN='replace-with-your-playground-token'
+```
+
+```python
+import asyncio
+import os
+
+from aiomonzo import MonzoClient
+
+
+async def main() -> None:
+    async with MonzoClient(
+        access_token=os.environ["MONZO_ACCESS_TOKEN"],
+    ) as monzo:
+        accounts = await monzo.list_accounts()
+        print([account.description for account in accounts])
+
+
+asyncio.run(main())
+```
+
+Avoid hard-coding or committing access tokens. For long-lived access, follow
+the [OAuth setup guide](docs/OAuth-Setup.md). With `uv`, install the package
+using `uv add aiomonzo`.
 
 ## Features
 
@@ -29,17 +73,13 @@ The package supports Python 3.12, 3.13, and 3.14.
 - Typed, secret-safe exceptions that do not retain provider response bodies.
 - Explicit async resource ownership and a `py.typed` marker.
 
-## Installation
+## Where aiomonzo fits
 
-```bash
-python -m pip install aiomonzo
-```
-
-With `uv`:
-
-```bash
-uv add aiomonzo
-```
+`aiomonzo` owns reusable Monzo request, response, OAuth, validation, and retry
+behavior. Applications retain control of credential persistence, encryption,
+tenant isolation, user interfaces, and deployment policy. This boundary keeps
+the package useful for personal scripts, private services, and application-owned
+credential brokers without imposing a storage or tenancy model.
 
 ## Documentation
 
@@ -57,33 +97,11 @@ uv add aiomonzo
 The same guides are published in the
 [GitHub Wiki](https://github.com/s-block/aiomonzo/wiki).
 
-## Static access token
+## Used by
 
-A static token is useful for short-lived development and API Playground
-experiments. Generate one in the
-[Monzo developer tools](https://developers.monzo.com/), approve access in the
-Monzo mobile app when prompted, and avoid hard-coding or committing it.
-
-```python
-import asyncio
-import os
-
-from aiomonzo import MonzoClient
-
-
-async def main() -> None:
-    async with MonzoClient(
-        access_token=os.environ["MONZO_ACCESS_TOKEN"],
-    ) as monzo:
-        identity = await monzo.who_am_i()
-        accounts = await monzo.list_accounts()
-        print(identity.user_id, [account.id for account in accounts])
-
-
-asyncio.run(main())
-```
-
-For long-lived access, follow the [OAuth setup guide](docs/OAuth-Setup.md).
+[s-block/monzo-mcp](https://github.com/s-block/monzo-mcp) is built on
+`aiomonzo` and provides a real-world integration example. `aiomonzo` remains an
+independent, general-purpose client library.
 
 ## OAuth with caller-owned storage
 
@@ -249,6 +267,17 @@ when available.
 Read the [security guide](docs/Security.md) before deploying OAuth token storage
 or using the client in a multi-process service.
 
+## Contributing and support
+
+Use [GitHub Issues](https://github.com/s-block/aiomonzo/issues) to report
+sanitized examples of unsupported Monzo API behavior, request endpoint support,
+or propose typing and model fixes. See the
+[development guide](docs/Development.md) for the local validation workflow.
+
+Report security issues privately as described above. Never include real Monzo
+credentials or financial data in an issue, pull request, or vulnerability
+report.
+
 ## Official Monzo resources
 
 - [Monzo Developer tools](https://developers.monzo.com/)
@@ -259,3 +288,13 @@ or using the client in a multi-process service.
 ## License
 
 MIT. This project is not affiliated with or endorsed by Monzo Bank.
+
+[ci]: https://github.com/s-block/aiomonzo/actions/workflows/ci.yml
+[ci-badge]: https://github.com/s-block/aiomonzo/actions/workflows/ci.yml/badge.svg?branch=main
+[license]: LICENSE
+[license-badge]: https://img.shields.io/pypi/l/aiomonzo
+[pep-561]: https://peps.python.org/pep-0561/
+[pypi]: https://pypi.org/project/aiomonzo/
+[pypi-version-badge]: https://img.shields.io/pypi/v/aiomonzo
+[python-versions-badge]: https://img.shields.io/pypi/pyversions/aiomonzo
+[typing-badge]: https://img.shields.io/badge/typing-py.typed-blue

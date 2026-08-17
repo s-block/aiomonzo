@@ -10,6 +10,17 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = { file = "LICENSE" }
 authors = [{ name = "Joshua Rowe" }]
+keywords = [
+    "api-client",
+    "asyncio",
+    "banking",
+    "fintech",
+    "httpx",
+    "monzo",
+    "oauth",
+    "pydantic",
+    "typed",
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: AsyncIO",
@@ -29,7 +40,9 @@ dependencies = [
 [project.urls]
 Changelog = "https://github.com/s-block/aiomonzo/blob/main/CHANGELOG.md"
 Documentation = "https://github.com/s-block/aiomonzo/wiki"
+Homepage = "https://pypi.org/project/aiomonzo/"
 Issues = "https://github.com/s-block/aiomonzo/issues"
+Security = "https://github.com/s-block/aiomonzo/security/advisories/new"
 Source = "https://github.com/s-block/aiomonzo"
 
 [dependency-groups]
