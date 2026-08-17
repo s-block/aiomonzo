@@ -45,6 +45,17 @@ make check
 strict mypy, all tests, wheel and source-distribution builds, Twine metadata
 validation, artifact-content checks, and an isolated wheel installation.
 
+## Distribution compatibility
+
+`aiomonzo` contains only Python code and package metadata, so each release
+publishes one `py3-none-any` wheel rather than separate operating-system or CPU
+wheels. That universal wheel supports the package's Python 3.12 through 3.14
+range on Linux, macOS, and Windows, including musl-based Alpine Linux.
+
+The release workflow installs the built wheel on Ubuntu, macOS, Windows, and a
+pinned Alpine Linux container before publishing. Platform-specific wheels would
+only be appropriate if the package later included native code or executables.
+
 Before committing:
 
 ```bash
@@ -82,9 +93,15 @@ The intended release flow is:
 2. Run `make check`.
 3. Commit and push the release.
 4. Create and publish a GitHub release tagged exactly `v<version>`.
-5. Let `.github/workflows/publish.yml` build and publish through PyPI Trusted
-   Publishing.
+5. Let `.github/workflows/publish.yml` build the universal wheel and source
+   distribution, validate installation across the supported operating-system
+   families, and publish through PyPI Trusted Publishing.
 
 The GitHub `pypi` environment and matching PyPI Trusted Publisher must be
 configured before the first workflow release. Do not add a long-lived PyPI API
-token to repository secrets.
+token to repository secrets. The PyPI publisher configuration is:
+
+- Owner: `s-block`
+- Repository: `aiomonzo`
+- Workflow: `publish.yml`
+- Environment: `pypi`

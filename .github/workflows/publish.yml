@@ -65,10 +65,86 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  compatibility:
+    name: Install universal wheel on ${{ matrix.platform }}
+    needs:
+      - build
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: Ubuntu
+            runner: ubuntu-latest
+          - platform: macOS
+            runner: macos-latest
+          - platform: Windows
+            runner: windows-latest
+    steps:
+      - name: Check out release commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: "3.14"
+          enable-cache: true
+
+      - name: Install locked dependencies
+        run: uv sync --dev
+
+      - name: Download validated distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: python-distributions
+          path: dist/
+
+      - name: Validate and install the release wheel
+        run: uv run python scripts/check_dist.py
+
+  alpine-compatibility:
+    name: Install universal wheel on Alpine Linux
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Download validated distributions
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: python-distributions
+          path: dist/
+
+      - name: Install and smoke-test in Alpine Linux
+        run: |
+          docker run --rm \
+            --volume "$GITHUB_WORKSPACE/dist:/dist:ro" \
+            python:3.14-alpine@sha256:05b2b8b732ecd268fee8727a369f936f022d1321b59befd13c30ede22769dcdc \
+            sh -euxc '
+              python -m pip install \
+                --disable-pip-version-check \
+                --root-user-action=ignore \
+                /dist/*.whl
+              python -I -c "
+          import asyncio
+          import aiomonzo
+
+          client = aiomonzo.MonzoClient(access_token=\"offline-test-token\")
+          asyncio.run(client.aclose())
+          "
+            '
+
   publish:
     name: Publish with trusted credentials
     needs:
       - build
+      - compatibility
+      - alpine-compatibility
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:

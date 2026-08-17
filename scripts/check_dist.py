@@ -61,12 +61,16 @@ def _validate_wheel(wheel: Path) -> None:
         metadata_files = [
             name for name in names if name.endswith(".dist-info/METADATA")
         ]
+        wheel_files = [name for name in names if name.endswith(".dist-info/WHEEL")]
         license_files = [
             name for name in names if name.endswith(".dist-info/licenses/LICENSE")
         ]
-        if len(metadata_files) != 1 or len(license_files) != 1:
-            raise RuntimeError("Wheel must contain one metadata and license file")
+        if len(metadata_files) != 1 or len(wheel_files) != 1 or len(license_files) != 1:
+            raise RuntimeError(
+                "Wheel must contain one metadata, wheel metadata, and license file"
+            )
         metadata = archive.read(metadata_files[0]).decode()
+        wheel_metadata = archive.read(wheel_files[0]).decode()
     missing = _PACKAGE_FILES - names
     if missing:
         message = f"Wheel is missing expected files: {sorted(missing)}"
@@ -76,6 +80,11 @@ def _validate_wheel(wheel: Path) -> None:
         or f"Version: {__version__}\n" not in metadata
     ):
         raise RuntimeError("Wheel metadata has an unexpected name or version")
+    if (
+        "Root-Is-Purelib: true\n" not in wheel_metadata
+        or "Tag: py3-none-any\n" not in wheel_metadata
+    ):
+        raise RuntimeError("Wheel must be a universal pure-Python distribution")
 
 
 def _validate_sdist(sdist: Path) -> None:
